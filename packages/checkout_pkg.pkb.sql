@@ -1,8 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY checkout_pkg IS
 
   ------------------------------------------------------------------------------
-  -- Internal helper: audit logging
+  -- PROCEDURE: log_audit
+  -- Purpose: Internal helper to log audit actions for entities (orders, etc.)
+  -- Parameters:
+  --   p_entity_type - Type of entity (e.g., 'ORDER')
+  --   p_entity_id   - ID of the entity
+  --   p_action      - Action performed
+  --   p_detail      - Additional details about the action
   ------------------------------------------------------------------------------
+
   PROCEDURE log_audit(
     p_entity_type IN VARCHAR2,
     p_entity_id   IN NUMBER,
@@ -15,9 +22,15 @@ CREATE OR REPLACE PACKAGE BODY checkout_pkg IS
   END log_audit;
 
   ------------------------------------------------------------------------------
-  -- Create a new cart order
-  -- JIRA: CHECKOUT-1010
+  -- FUNCTION: create_cart_order
+  -- Purpose: Creates a new cart order for a customer with shipping and billing addresses.
+  -- Returns: The new order_id.
+  -- Parameters:
+  --   p_customer_id     - Customer placing the order
+  --   p_ship_address_id - Shipping address ID
+  --   p_bill_address_id - Billing address ID
   ------------------------------------------------------------------------------
+
   FUNCTION create_cart_order(
     p_customer_id     IN NUMBER,
     p_ship_address_id IN NUMBER,
@@ -46,9 +59,14 @@ CREATE OR REPLACE PACKAGE BODY checkout_pkg IS
   END create_cart_order;
 
   ------------------------------------------------------------------------------
-  -- Add item to cart
-  -- JIRA: CHECKOUT-1123
+  -- PROCEDURE: add_item
+  -- Purpose: Adds a product item to an order (cart), checks inventory and product status.
+  -- Parameters:
+  --   p_order_id   - Order to add item to
+  --   p_product_id - Product to add
+  --   p_quantity   - Quantity to add
   ------------------------------------------------------------------------------
+
   PROCEDURE add_item(
     p_order_id   IN NUMBER,
     p_product_id IN NUMBER,
@@ -109,9 +127,13 @@ CREATE OR REPLACE PACKAGE BODY checkout_pkg IS
   END add_item;
 
   ------------------------------------------------------------------------------
-  -- Apply coupon to order
-  -- JIRA: CHECKOUT-1421
+  -- PROCEDURE: apply_coupon
+  -- Purpose: Applies a coupon code to an order, validates coupon status and limits.
+  -- Parameters:
+  --   p_order_id    - Order to apply coupon to
+  --   p_coupon_code - Coupon code to apply
   ------------------------------------------------------------------------------
+
   PROCEDURE apply_coupon(
     p_order_id    IN NUMBER,
     p_coupon_code IN VARCHAR2
@@ -153,9 +175,13 @@ CREATE OR REPLACE PACKAGE BODY checkout_pkg IS
   END apply_coupon;
 
   ------------------------------------------------------------------------------
-  -- Reprice order (central pricing logic)
-  -- JIRA: CHECKOUT-1588
+  -- PROCEDURE: reprice_order
+  -- Purpose: Central pricing logic to recalculate all order amounts (subtotal, discount, shipping, tax, total).
+  -- Parameters:
+  --   p_order_id    - Order to reprice
+  --   p_ship_method - Shipping method (default 'GROUND')
   ------------------------------------------------------------------------------
+
   PROCEDURE reprice_order(
     p_order_id    IN NUMBER,
     p_ship_method IN VARCHAR2 DEFAULT 'GROUND'
@@ -237,9 +263,13 @@ CREATE OR REPLACE PACKAGE BODY checkout_pkg IS
   END reprice_order;
 
   ------------------------------------------------------------------------------
-  -- Submit order
-  -- JIRA: CHECKOUT-1501
+  -- PROCEDURE: submit_order
+  -- Purpose: Finalizes and submits an order, updates coupon usage, and sets order status.
+  -- Parameters:
+  --   p_order_id    - Order to submit
+  --   p_ship_method - Shipping method (default 'GROUND')
   ------------------------------------------------------------------------------
+
   PROCEDURE submit_order(
     p_order_id    IN NUMBER,
     p_ship_method IN VARCHAR2 DEFAULT 'GROUND'
@@ -269,9 +299,13 @@ CREATE OR REPLACE PACKAGE BODY checkout_pkg IS
   END submit_order;
 
   ------------------------------------------------------------------------------
-  -- Order summary (JSON)
-  -- JIRA: CHECKOUT-1603
+  -- FUNCTION: get_order_summary
+  -- Purpose: Returns a JSON summary of the order (amounts, status, coupon, etc.)
+  -- Parameters:
+  --   p_order_id - Order to summarize
+  -- Returns: JSON CLOB with order summary
   ------------------------------------------------------------------------------
+
   FUNCTION get_order_summary(
     p_order_id IN NUMBER
   ) RETURN CLOB
