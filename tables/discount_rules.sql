@@ -6,5 +6,7 @@ CREATE TABLE discount_rules (
   fixed_off       NUMBER(10,2),
   min_subtotal    NUMBER(10,2) DEFAULT 0 NOT NULL,
   category        VARCHAR2(60),
-  active_flag     CHAR(1) DEFAULT 'Y' NOT NULL
+  active_flag     CHAR(1) DEFAULT 'Y' NOT NULL,
+  max_discount_cap NUMBER,
+  expiry_date      DATE
 );
